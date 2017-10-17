@@ -89,8 +89,8 @@ class ReflexAgent(Agent):
         minDistFoodCur = maxManhattanDist
         minDistFoodNew = maxManhattanDist
         curPos = currentGameState.getPacmanPosition()
-        currentFoodList = currentGameState.getFood().asList()
-        for fd in currentFoodList:
+        curFood = currentGameState.getFood()
+        for fd in curFood.asList():
             dist2FoodCur = manhattanDistance(curPos, fd)
             dist2FoodNew = manhattanDistance(newPos, fd)
             if dist2FoodCur < minDistFoodCur:
@@ -98,20 +98,23 @@ class ReflexAgent(Agent):
             if dist2FoodNew < minDistFoodNew:
                 minDistFoodNew = dist2FoodNew
 
-        # choice a ratio between food and ghost
+        ### choice a ratio between food and ghost
+        # alway not go to corner if there is no food
+        if len(successorGameState.getLegalActions()) <= 2 and not curFood[newPos[0]][newPos[1]]:
+            return -maxManhattanDist - 1
         if minDistGhost <= 1:
             return -maxManhattanDist
-        # if newPos in [(8, 5), (9, 5), (10, 5), (11, 5)]:
-        #     return -maxManhattanDist + 1
         if minDistGhost <= 2:
-            return minDistGhost + len(currentGameState.getLegalActions())
+            return minDistGhost + 0.25 * len(successorGameState.getLegalActions())
+        # if there is food at newPos
+        if curFood[newPos[0]][newPos[1]]:
+            return maxManhattanDist
+        # keep moving maybe good
         if action is Directions.STOP:
-            return -maxManhattanDist
+            return -maxManhattanDist + 1
         # if minDistFoodCur == minDistFoodNew and minDistFoodNew != 1:
         #     return -maxManhattanDist + 1
-        if len(currentFoodList) is not len(newFood.asList()):
-            return maxManhattanDist
-        return -minDistFoodNew + len(currentGameState.getLegalActions())
+        return -minDistFoodNew + 0.5 * len(successorGameState.getLegalActions()) + 0.2 * minDistGhost
 
 def scoreEvaluationFunction(currentGameState):
     """
