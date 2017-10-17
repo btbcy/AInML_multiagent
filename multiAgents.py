@@ -104,8 +104,8 @@ class ReflexAgent(Agent):
             return -maxManhattanDist - 1
         if minDistGhost <= 1:
             return -maxManhattanDist
-        if minDistGhost <= 2:
-            return minDistGhost + 0.25 * len(successorGameState.getLegalActions())
+        # if minDistGhost <= 2:
+        #     return minDistGhost + 0.25 * len(successorGameState.getLegalActions())
         # if there is food at newPos
         if curFood[newPos[0]][newPos[1]]:
             return maxManhattanDist
@@ -169,7 +169,74 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+
+        rootValue = self.value(gameState, 0, self.index)
+        action = rootValue[1]
+        return action
+
+    def value(self, gameState, curDepth, agentIndex):
+        """
+          call maxValue or minValue
+          return (value, action)
+        """
+
+        if agentIndex == gameState.getNumAgents():
+            curDepth += 1
+            agentIndex = 0
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        if len(legalMoves) == 0:
+            return (self.evaluationFunction(gameState), 0)
+
+        if curDepth == self.depth:
+            return (self.evaluationFunction(gameState), 0)
+
+        if agentIndex == 0:
+            return self.maxValue(gameState, curDepth, agentIndex)
+        else:
+            return self.minValue(gameState, curDepth, agentIndex)
+
+    def maxValue(self, gameState, curDepth, agentIndex):
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        theValue = -9999999
+        theAction = legalMoves[0]
+
+        for action in legalMoves:
+            nextState = gameState.generateSuccessor(agentIndex, action)
+            evaluationValue = self.value(nextState, curDepth, agentIndex + 1)[0]
+
+            if evaluationValue >= theValue:
+                theValue = evaluationValue
+                theAction = action
+
+        return (theValue, theAction)
+
+    def minValue(self, gameState, curDepth, agentIndex):
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        theValue = 9999999
+        theAction = legalMoves[0]
+
+        for action in legalMoves:
+            nextState = gameState.generateSuccessor(agentIndex, action)
+            evaluationValue = self.value(nextState, curDepth, agentIndex + 1)[0]
+
+            if evaluationValue <= theValue:
+                theValue = evaluationValue
+                theAction = action
+
+        return (theValue, theAction)
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
