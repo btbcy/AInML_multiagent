@@ -206,6 +206,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if Directions.STOP in legalMoves:
             legalMoves.remove(Directions.STOP)
 
+        # scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        # bestScore = max(scores)
+        # bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        # chosenIndex = random.choice(bestIndices)
+        # return [bestScore, legalMoves[chosenIndex]]
+
         theValue = -9999999
         theAction = legalMoves[0]
 
@@ -224,6 +230,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
         legalMoves = gameState.getLegalActions(agentIndex)
         if Directions.STOP in legalMoves:
             legalMoves.remove(Directions.STOP)
+
+        # scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        # bestScore = min(scores)
+        # bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        # chosenIndex = random.choice(bestIndices)
+        # return [bestScore, legalMoves[chosenIndex]]
 
         theValue = 9999999
         theAction = legalMoves[0]
@@ -248,7 +260,82 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+
+        rootValue = self.value(gameState, 0, self.index, -9999999 , 9999999)
+        action = rootValue[1]
+        return action
+
+    def value(self, gameState, curDepth, agentIndex, alpha, beta):
+
+        if agentIndex == gameState.getNumAgents():
+            curDepth += 1
+            agentIndex = 0
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        if len(legalMoves) == 0:
+            return (self.evaluationFunction(gameState), 0)
+
+        if curDepth == self.depth:
+            return (self.evaluationFunction(gameState), 0)
+
+        if agentIndex == 0:
+            return self.maxValue(gameState, curDepth, agentIndex, alpha, beta)
+        else:
+            return self.minValue(gameState, curDepth, agentIndex, alpha, beta)
+
+    def maxValue(self, gameState, curDepth, agentIndex, alpha, beta):
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        theValue = -9999999
+        theAction = legalMoves[0]
+
+        for action in legalMoves:
+            nextState = gameState.generateSuccessor(agentIndex, action)
+            evaluationValue = self.value(nextState, curDepth, agentIndex + 1, alpha, beta)[0]
+
+            if evaluationValue >= theValue:
+                theValue = evaluationValue
+                theAction = action
+
+            if theValue > alpha:
+                alpha = theValue
+
+            if theValue > beta:
+                return (theValue, theAction)
+
+        return (theValue, theAction)
+
+    def minValue(self, gameState, curDepth, agentIndex, alpha, beta):
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        theValue = 9999999
+        theAction = legalMoves[0]
+
+        for action in legalMoves:
+            nextState = gameState.generateSuccessor(agentIndex, action)
+            evaluationValue = self.value(nextState, curDepth, agentIndex + 1, alpha, beta)[0]
+
+            if evaluationValue <= theValue:
+                theValue = evaluationValue
+                theAction = action
+
+            if theValue < beta:
+                beta = theValue
+
+            if theValue < alpha:
+                return (theValue, theAction)
+
+        return (theValue, theAction)
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
