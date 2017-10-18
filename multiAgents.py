@@ -171,9 +171,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
 
-        rootValue = self.value(gameState, 0, self.index)
-        action = rootValue[1]
-        return action
+        # rootValue = self.value(gameState, 0, self.index)
+        # action = rootValue[1]
+        # return action
+        return self.value(gameState, 0, self.index)[1]
 
     def value(self, gameState, curDepth, agentIndex):
         """
@@ -190,10 +191,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             legalMoves.remove(Directions.STOP)
 
         if len(legalMoves) == 0:
-            return (self.evaluationFunction(gameState), 0)
+            return (self.evaluationFunction(gameState), None)
 
         if curDepth == self.depth:
-            return (self.evaluationFunction(gameState), 0)
+            return (self.evaluationFunction(gameState), None)
 
         if agentIndex == 0:
             return self.maxValue(gameState, curDepth, agentIndex)
@@ -231,24 +232,24 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if Directions.STOP in legalMoves:
             legalMoves.remove(Directions.STOP)
 
-        # scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
-        # bestScore = min(scores)
+        scores = [self.value(gameState.generateSuccessor(agentIndex, action), curDepth, agentIndex + 1)[0] for action in legalMoves]
+        worstScore = min(scores)
         # bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
         # chosenIndex = random.choice(bestIndices)
-        # return [bestScore, legalMoves[chosenIndex]]
+        return (worstScore, None)
 
-        theValue = 9999999
-        theAction = legalMoves[0]
+        # theValue = 9999999
+        # theAction = legalMoves[0]
 
-        for action in legalMoves:
-            nextState = gameState.generateSuccessor(agentIndex, action)
-            evaluationValue = self.value(nextState, curDepth, agentIndex + 1)[0]
+        # for action in legalMoves:
+        #     nextState = gameState.generateSuccessor(agentIndex, action)
+        #     evaluationValue = self.value(nextState, curDepth, agentIndex + 1)[0]
 
-            if evaluationValue <= theValue:
-                theValue = evaluationValue
-                theAction = action
+        #     if evaluationValue <= theValue:
+        #         theValue = evaluationValue
+        #         theAction = action
 
-        return (theValue, theAction)
+        # return (theValue, theAction)
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -262,9 +263,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
 
-        rootValue = self.value(gameState, 0, self.index, -9999999 , 9999999)
-        action = rootValue[1]
-        return action
+        # rootValue = self.value(gameState, 0, self.index, -9999999 , 9999999)
+        # action = rootValue[1]
+        # return action
+        return self.value(gameState, 0, self.index, -9999999 , 9999999)[1]
 
     def value(self, gameState, curDepth, agentIndex, alpha, beta):
 
@@ -277,10 +279,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             legalMoves.remove(Directions.STOP)
 
         if len(legalMoves) == 0:
-            return (self.evaluationFunction(gameState), 0)
+            return (self.evaluationFunction(gameState), None)
 
         if curDepth == self.depth:
-            return (self.evaluationFunction(gameState), 0)
+            return (self.evaluationFunction(gameState), None)
 
         if agentIndex == 0:
             return self.maxValue(gameState, curDepth, agentIndex, alpha, beta)
@@ -350,7 +352,78 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+
+        # rootValue = self.value(gameState, 0, self.index)
+        # action = rootValue[1]
+        # return action
+        return self.value(gameState, 0, self.index)[1]
+
+    def value(self, gameState, curDepth, agentIndex):
+        """
+        call maxValue or minValue
+        return (value, action)
+        """
+
+        if agentIndex == gameState.getNumAgents():
+            curDepth += 1
+            agentIndex = 0
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        if len(legalMoves) == 0:
+            return (self.evaluationFunction(gameState), None)
+
+        if curDepth == self.depth:
+            return (self.evaluationFunction(gameState), None)
+
+        if agentIndex == 0:
+            return self.maxValue(gameState, curDepth, agentIndex)
+        else:
+            return self.expValue(gameState, curDepth, agentIndex)
+
+    def maxValue(self, gameState, curDepth, agentIndex):
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        theValue = -9999999
+        theAction = legalMoves[0]
+
+        for action in legalMoves:
+            nextState = gameState.generateSuccessor(agentIndex, action)
+            evaluationValue = self.value(nextState, curDepth, agentIndex + 1)[0]
+
+            if evaluationValue >= theValue:
+                theValue = evaluationValue
+                theAction = action
+
+        return (theValue, theAction)
+
+    def expValue(self, gameState, curDepth, agentIndex):
+
+        legalMoves = gameState.getLegalActions(agentIndex)
+        if Directions.STOP in legalMoves:
+            legalMoves.remove(Directions.STOP)
+
+        scores = [self.value(gameState.generateSuccessor(agentIndex, action), curDepth, agentIndex + 1)[0] for action in legalMoves]
+
+        theValue = 1.0 * sum(scores) / len(scores)
+        theAction = None
+
+        # closestNum = 9999999
+        # keyIndex = 0
+        # for index in range(len(scores)):
+        #     temp = abs(scores[index] - theValue)
+        #     if  temp < closestNum:
+        #         closestNum = temp
+        #         keyIndex = index
+        # theAction = legalMoves[keyIndex]
+
+        return (theValue, theAction)
 
 def betterEvaluationFunction(currentGameState):
     """
