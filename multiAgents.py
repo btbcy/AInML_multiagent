@@ -448,18 +448,43 @@ def betterEvaluationFunction(currentGameState):
     nearestFood = min([manhattanDistance(position, food) for food in foodList]) if foodList else 0
 
     # runaway from normal ghost
-    if nearestNormalGhost <= 1:
-        return -99999999
+    # if nearestNormalGhost <= 1:
+    #     return -99999999
     # scaredGhost > capsule > food
-    if nearestScaredGhost == 1:
-        return 99999999
+    # if nearestScaredGhost == 1:
+    #     return 99999999
     # if nearestCapsule == 1:
-    #    return 99999999 - 100000
+    #     return 99999999 - 100000
     # if nearestFood == 1:
     #    return 99999999 - 200000
 
-    return -1 * nearestScaredGhost - 2 * nearestCapsule - 10 * nearestFood - 100 * len(foodList) + 0.5 * nearestNormalGhost
+    # maxManhattanDist = currentGameState.getWalls().width + currentGameState.getWalls().height
 
+    # if scaredGhosts:
+    #     return 5 * (maxManhattanDist - 1.0 * nearestScaredGhost) + 1.0 * nearestNormalGhost - 100 * len(scaredGhosts)
+    # if capsules:
+    #     return 5 * (maxManhattanDist -1.0 * nearestCapsule) + 1.0 * nearestNormalGhost - 100 * len(capsules)
+
+    # return 0
+    # return -1 * nearestScaredGhost - 2 * nearestCapsule - 10 * nearestFood - 100 * len(foodList) + 0.5 * nearestNormalGhost
+
+    WEIGHT_NORMAL_GHOST = 10.0
+    WEIGHT_SCARED_GHOST = 100.0
+    WEIGHT_FOOD = 10.0
+    WEIGHT_CAPSULE = 30.0
+
+    score = currentGameState.getScore()
+
+    if scaredGhosts and nearestScaredGhost > 0:
+        score += WEIGHT_SCARED_GHOST / nearestScaredGhost
+    if normalGhosts and nearestNormalGhost > 0:
+        score -= WEIGHT_NORMAL_GHOST / nearestNormalGhost
+    if capsules:
+        score += WEIGHT_CAPSULE / nearestCapsule
+    if foodList:
+        score += WEIGHT_FOOD / nearestFood
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
