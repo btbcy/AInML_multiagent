@@ -174,9 +174,41 @@ class MinimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
 
-        # rootValue = self.value(gameState, 0, self.index)
-        # action = rootValue[1]
-        # return action
+        # def value(state, curDepth, agentIndex):
+        #     """
+        #     return value which is a number
+        #     """
+        #     if agentIndex == gameState.getNumAgents():
+        #         curDepth += 1
+        #         agentIndex = 0
+
+        #     legalMoves = state.getLegalActions(agentIndex)
+        #     if Directions.STOP in legalMoves:
+        #         legalMoves.remove(Directions.STOP)
+
+        #     if len(legalMoves) == 0 or curDepth == self.depth:
+        #         return self.evaluationFunction(gameState)
+
+        #     legalMoves = state.getLegalActions(agentIndex)
+        #     if Directions.STOP in legalMoves:
+        #         legalMoves.remove(Directions.STOP)
+
+        #     scores = [value(state.generateSuccessor(agentIndex, action), curDepth, agentIndex + 1) for action in legalMoves]
+
+        #     if agentIndex == 0:
+        #         return max(scores)
+        #     else:
+        #         return min(scores)
+
+        # legalMoves = gameState.getLegalActions(0)
+        # if Directions.STOP in legalMoves:
+        #     legalMoves.remove(Directions.STOP)
+        # scores = [value(gameState.generateSuccessor(0, action), 0, 1) for action in legalMoves]
+        # bestScore = max(scores)
+        # bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        # chosenIndex = random.choice(bestIndices)
+        # return legalMoves[chosenIndex]
+
         return self.value(gameState, 0, self.index)[1]
 
     def value(self, gameState, curDepth, agentIndex):
