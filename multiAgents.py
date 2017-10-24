@@ -79,24 +79,27 @@ class ReflexAgent(Agent):
         maxManhattanDist = successorGameState.getWalls().width + successorGameState.getWalls().height
 
         # find the distance of the nearest ghost
-        minDistGhost = maxManhattanDist
-        for ghostState in newGhostStates:
-            dist2Ghost = manhattanDistance(newPos, ghostState.getPosition())
-            if dist2Ghost < minDistGhost:
-                minDistGhost = dist2Ghost
+        minDistGhost = min([manhattanDistance(newPos, ghostState.getPosition()) for ghostState in newGhostStates]) if newGhostStates else maxManhattanDist
+        # minDistGhost = maxManhattanDist
+        # for ghostState in newGhostStates:
+        #     dist2Ghost = manhattanDistance(newPos, ghostState.getPosition())
+        #     if dist2Ghost < minDistGhost:
+        #         minDistGhost = dist2Ghost
 
         # find the distance of the nearst food
-        minDistFoodCur = maxManhattanDist
-        minDistFoodNew = maxManhattanDist
-        curPos = currentGameState.getPacmanPosition()
+
+        # minDistFoodCur = maxManhattanDist
+        # minDistFoodNew = maxManhattanDist
+        # curPos = currentGameState.getPacmanPosition()
         curFood = currentGameState.getFood()
-        for fd in curFood.asList():
-            dist2FoodCur = manhattanDistance(curPos, fd)
-            dist2FoodNew = manhattanDistance(newPos, fd)
-            if dist2FoodCur < minDistFoodCur:
-                minDistFoodCur = dist2FoodCur
-            if dist2FoodNew < minDistFoodNew:
-                minDistFoodNew = dist2FoodNew
+        minDistFoodNew = min([manhattanDistance(newPos, fd) for fd in curFood.asList()]) if curFood.asList() else maxManhattanDist
+        # for fd in curFood.asList():
+        #     dist2FoodCur = manhattanDistance(curPos, fd)
+        #     dist2FoodNew = manhattanDistance(newPos, fd)
+        #     if dist2FoodCur < minDistFoodCur:
+        #         minDistFoodCur = dist2FoodCur
+        #     if dist2FoodNew < minDistFoodNew:
+        #         minDistFoodNew = dist2FoodNew
 
         ### choice a ratio between food and ghost
         # alway not go to corner if there is no food
